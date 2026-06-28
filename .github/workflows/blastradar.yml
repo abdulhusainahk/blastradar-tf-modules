@@ -1,0 +1,25 @@
+name: blastradar
+on:
+  pull_request:
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: abdulhusainahk/blastradar@v0
+        with:
+          root: "."
+          consumers: "org-graph.yaml"
+          gate-at: "high"
+      - if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh pr comment ${{ github.event.pull_request.number }} --body-file blastradar-report.md
